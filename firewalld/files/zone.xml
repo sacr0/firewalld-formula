@@ -37,6 +37,9 @@
   {%- if 'masquerade' in rule %}
     {%- if rule.masquerade %}<masquerade/>{%- endif %}
   {%- endif %}
+  {%- if 'forward' in rule %}
+    {%- if rule.forward %}<forward/>{%- endif %}
+  {%- endif %}
   {%- if 'forward_port' in rule %}
     {%- if 'comment' in rule.forward_port %}
       <!-- {{ rule.forward_port.comment }} -->
@@ -101,9 +104,17 @@
 {%- endif %}
 {%- for k,val in zone.items() %}
   {%- if k.endswith("services") %}
-    {%- for v in val %}
+    {%- if val is mapping %}
+      {%- for v,enable in val.items() %}
+        {%- if enable %}
   <service name="{{ v }}" />
-    {%- endfor %}
+        {%- endif %}
+      {%- endfor %}
+    {%- else %}
+      {%- for v in val %}
+  <service name="{{ v }}" />
+      {%- endfor %}
+    {%- endif %}
   {%- endif %}
 {%- endfor %}
 {%- if 'ports' in zone %}
@@ -130,6 +141,11 @@
 {%- if 'masquerade' in zone %}
   {%- if zone.masquerade %}
   <masquerade/>
+  {%- endif %}
+{%- endif %}
+{%- if 'forward' in zone %}
+  {%- if zone.forward %}
+  <forward/>
   {%- endif %}
 {%- endif %}
 {%- if 'forward_ports' in zone %}
